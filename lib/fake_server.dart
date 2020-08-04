@@ -10,12 +10,15 @@ class FakeServer {
   Stream<dynamic> getWeather() {
     new Timer(Duration(seconds: 5), () {
       if ((requestNumber + 1) % 3 == 0) {
+        requestNumber++;
         subject.add('{"lon":-0.13,"lat":51.51}');
       }
       if ((requestNumber + 1) % 3 == 1) {
+        requestNumber++;
         subject.add('{"msg":"Auth error"}');
       }
       if ((requestNumber + 1) % 3 == 2) {
+        requestNumber++;
         subject.add('<html> <some>');
       }
     });
