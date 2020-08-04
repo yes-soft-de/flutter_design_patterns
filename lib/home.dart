@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
-import 'package:patterns_app/coord_model.dart';
-import 'package:patterns_app/fake_server.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:patterns_app/coord_bloc.dart';
+import 'package:patterns_app/coord_event.dart';
+import 'package:patterns_app/coord_state.dart';
 
 class HomeScreen extends StatefulWidget {
   @override
@@ -8,46 +10,87 @@ class HomeScreen extends StatefulWidget {
 }
 
 class _HomeScreenState extends State<HomeScreen> {
-  FakeServer _server = FakeServer();
-
   @override
   Widget build(BuildContext context) {
-    return FutureBuilder(
-      future: _server.getWeather(),
-      builder: (context, snapshot) {
-        if (!snapshot.hasData) {
-          return Scaffold(
-            body: Center(child: Text('Error Loading Data')),
-          );
+    return BlocBuilder<CoordBloc, CoordState>(
+      builder: (BuildContext context, state) {
+        print(state.toString());
+        if (state is CoordInitState) {
+          BlocProvider.of<CoordBloc>(context).add(CoordEvent.EVENT_REFRESH);
+          return drawLoadingScreen();
+        } else if (state is CoordLoadingState) {
+          return drawLoadingScreen();
+        } else if (state is CoordLoadErrorState) {
+          return drawErrorScreen();
+        } else if (state is CoordLoadSuccessState) {
+          print('Got Success Event');
+          CoordLoadSuccessState successState = state;
+          return drawSuccessScreen(successState.coordModel.lon.toString(),
+              successState.coordModel.lat.toString());
+        } else {
+          return drawErrorScreen();
         }
+      },
+    );
+  }
 
-        CoordModel response = CoordModel.fromJson(snapshot.data);
-
-        return Scaffold(
-          body: Center(
-              child: Column(
+  drawSuccessScreen(String lat, String lan) {
+    return Scaffold(
+      body: Center(
+          child: Column(
+        mainAxisAlignment: MainAxisAlignment.spaceAround,
+        children: <Widget>[
+          Text(
+            'Weather Application',
+            style: TextStyle(color: Colors.blue, fontSize: 24),
+          ),
+          Row(
             mainAxisAlignment: MainAxisAlignment.spaceAround,
             children: <Widget>[
-              Text(
-                'Weather Application',
-                style: TextStyle(color: Colors.blue, fontSize: 24),
+              Flex(
+                direction: Axis.horizontal,
+                children: <Widget>[Text('lon: '), Text(lan)],
               ),
-              Row(
-                children: <Widget>[
-                  Flex(
-                    direction: Axis.horizontal,
-                    children: <Widget>[Text('lon: '), Text(response.lon.toString())],
-                  ),
-                  Flex(
-                    direction: Axis.horizontal,
-                    children: <Widget>[Text('lat: '), Text(response.lat.toString())],
-                  )
-                ],
+              Flex(
+                direction: Axis.horizontal,
+                children: <Widget>[Text('lat: '), Text(lat)],
               )
             ],
-          )),
-        );
+          ),
+          _reloadButton()
+        ],
+      )),
+    );
+  }
+
+  drawErrorScreen() {
+    return Scaffold(
+      body: Center(
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.spaceAround,
+          children: <Widget>[Text('Load Error'), _reloadButton()],
+        ),
+      ),
+    );
+  }
+
+  drawLoadingScreen() {
+    return Scaffold(
+      body: Center(
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.spaceAround,
+          children: <Widget>[Text('Loading'), _reloadButton()],
+        ),
+      ),
+    );
+  }
+
+  RaisedButton _reloadButton() {
+    return RaisedButton(
+      onPressed: () {
+        BlocProvider.of<CoordBloc>(context).add(CoordEvent.EVENT_REFRESH);
       },
+      child: Text('Reload'),
     );
   }
 }
