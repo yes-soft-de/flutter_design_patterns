@@ -1,29 +1,17 @@
 import 'dart:async';
 
-import 'package:rxdart/rxdart.dart';
-
 class FakeServer {
   int requestNumber = 0;
 
-  PublishSubject<dynamic> subject = new PublishSubject();
+  Future<dynamic> getWeather() async {
+    await Future.delayed(Duration(seconds: 3));
 
-  Stream<dynamic> getWeather() {
-    new Timer(Duration(seconds: 5), () {
-      if ((requestNumber + 1) % 3 == 0) {
-        subject.add('{"lon":-0.13,"lat":51.51}');
-      }
-      if ((requestNumber + 1) % 3 == 1) {
-        subject.add('{"msg":"Auth error"}');
-      }
-      if ((requestNumber + 1) % 3 == 2) {
-        subject.add('<html> <some>');
-      }
-    });
-
-    return subject.stream;
-  }
-
-  dispose() {
-    subject.close();
+    if ((requestNumber + 1) % 3 == 0) {
+      return '{"lon":-0.13,"lat":51.51}';
+    } else if ((requestNumber + 1) % 3 == 1) {
+      return '{"msg":"Auth error"}';
+    } else if ((requestNumber + 1) % 3 == 2) {
+      return '<html> <some>';
+    }
   }
 }

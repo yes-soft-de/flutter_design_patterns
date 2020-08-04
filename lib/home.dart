@@ -12,8 +12,8 @@ class _HomeScreenState extends State<HomeScreen> {
 
   @override
   Widget build(BuildContext context) {
-    return StreamBuilder(
-      stream: _server.getWeather(),
+    return FutureBuilder(
+      future: _server.getWeather(),
       builder: (context, snapshot) {
         if (!snapshot.hasData) {
           return Scaffold(
