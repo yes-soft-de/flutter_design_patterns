@@ -1,3 +1,5 @@
+import 'dart:convert';
+
 import 'package:flutter/material.dart';
 import 'package:patterns_app/coord_model.dart';
 import 'package:patterns_app/fake_server.dart';
@@ -21,7 +23,7 @@ class _HomeScreenState extends State<HomeScreen> {
           );
         }
 
-        CoordModel response = CoordModel.fromJson(snapshot.data);
+        CoordModel response = CoordModel.fromJson(jsonDecode(snapshot.data));
 
         return Scaffold(
           body: Center(
