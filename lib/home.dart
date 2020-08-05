@@ -66,12 +66,7 @@ class _HomeScreenState extends State<HomeScreen> {
               )
             ],
           ),
-          RaisedButton(
-            onPressed: () {
-              _server.getWeather();
-            },
-            child: Text('Refresh'),
-          )
+          _reloadButton()
         ],
       )),
     );
@@ -80,7 +75,13 @@ class _HomeScreenState extends State<HomeScreen> {
   Scaffold drawErrorScreen() {
     return Scaffold(
       body: Center(
-        child: Text('Error Loading Data'),
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.spaceAround,
+          children: <Widget>[
+            Text('Error Loading Data'),
+            _reloadButton()
+          ],
+        ),
       ),
     );
   }
@@ -90,6 +91,15 @@ class _HomeScreenState extends State<HomeScreen> {
       body: Center(
         child: Text('Loading'),
       ),
+    );
+  }
+
+  RaisedButton _reloadButton() {
+    return RaisedButton(
+      onPressed: () {
+        widget.bloc.getWeather();
+      },
+      child: Text('Refresh'),
     );
   }
 }
